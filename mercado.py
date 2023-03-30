@@ -98,6 +98,10 @@ def lerProdutosCliente(produtos: Produto) -> None:
 listaProdutos = {
     'Contra-filé',
     'Lata de cerveja',
+    'Pão de alho',
+    'refrigerane',
+    'carvao',
+    'panceta'
 }
 
 prod = lerProdutosGerente(listaProdutos)
