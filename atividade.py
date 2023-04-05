@@ -5,7 +5,7 @@ error = []
 
 class Produto:
     
-    def __init__(self, nome: str, preco: float, quantiMaxima: float, quantiMinima: float, descontoExtra: float, desconto: int = 20) -> None:
+    def __init__(self, nome: str, preco: float, quantiMaxima: float, quantiMinima: float, descontoExtra: float,desconto: int = 20) -> None:
         self.nome = nome
         self.preco = preco
         self.quantiMaxima = quantiMaxima
@@ -28,22 +28,20 @@ class CarrinhoDecompras:
             self.produtos.append((produto, quantidade))
 
     #entrega somente desconto
-    def calcularDesconto(self):
+    def calcularDesconto(self, descontoDe10Por):
+        valorTotal = self.calcularValorTotal()
         desconto = 0
         for produto, quanti in self.produtos:
-            desconto += ((produto.preco * produto.desconto) / 100)
-            if produto.descontoExtra != None:
-                desconto += ((produto.preco * produto.descontoExtra) / 100)
+            if produto.descontoExtra < quanti:
+                desconto += (((produto.preco * quanti) * produto.desconto) / 100)
+        if valorTotal > descontoDe10Por:
+            desconto += valorTotal * 0.10
         return desconto
 
     # Entrga o valor com desconto
-    def calcularValorComDesconto(self):
+    def calcularValorComDesconto(self, descontoDe10Por: float):
         valorTotal = self.calcularValorTotal()
-        for produto, quanti in self.produtos:
-            valorTotal -= ((produto.preco * produto.desconto) / 100)
-            if produto.descontoExtra != None:
-                valorTotal -= ((produto.preco * produto.descontoExtra) / 100)
-        
+        valorTotal -= self.calcularDesconto(descontoDe10Por)
         return valorTotal
 
     # Entrga o valor bruto
@@ -67,14 +65,9 @@ def lerProdutosGerente(produtos: list) -> list:
         preco = float(input('Preço do produto: '))
         quantiMinima = int(input('Quantidade mínima do produto: '))
         quantiMaxima = int(input('Quantidade máxima do produto: '))
-        descontoExtra = input('Desconto extra (s/n): ').lower()
-        if descontoExtra in ['s', 'sim']:
-            descontoExtra = float(input('Desconto extra: '))
-        else:
-            descontoExtra = None
-
+        decontoApartir = float(input('desconto de 20% apartir: '))
         prodLista.append(Produto(i, preco, quantiMaxima,
-                         quantiMinima, descontoExtra))
+                         quantiMinima, decontoApartir))
 
     return prodLista
 
@@ -86,7 +79,7 @@ def lerProdutosCliente(produtos: Produto) -> None:
     for i in produtos:
         system('cls')
         print(
-            f'Insira as informações abaixo (Cliente): \n{"=="*20}\nInsira as informações do produto "{i.nome}":\nPreço={i.preco}\nMaximo={i.quantiMaxima}\nMinima={i.quantiMinima}')
+            f'Insira as informações abaixo (Cliente): \n{"=="*20}\nInsira as informações do produto "{i.nome}":\nPreço={i.preco}\nMaximo={i.quantiMaxima}\nMinima={i.quantiMinima}\nDesconto a partir de {i.descontoExtra}')
         # clear_output()
 
         quantidade = int(input('Insira a quantidade da compra : '))
@@ -101,6 +94,9 @@ listaProdutos = {
 }
 
 prod = lerProdutosGerente(listaProdutos)
+
+descontoDe10Porce = float(input('A partir de qual total a compra tem mais 10% de desconto: '))
+
 carrinhoCompras = lerProdutosCliente(prod)
 
 system('cls')
@@ -112,7 +108,7 @@ if error != []:
 print(f'''
 Pagamento
 {"="*15}
-Valor Total: {carrinhoCompras.calcularValorTotal()}
-Desconto: {carrinhoCompras.calcularDesconto()}
-Valor com desconto: {carrinhoCompras.calcularValorComDesconto()}
+Valor Total: R$ {carrinhoCompras.calcularValorTotal():.2f}
+Desconto: R$ {carrinhoCompras.calcularDesconto(descontoDe10Porce):.2f}
+Valor com desconto: R$ {carrinhoCompras.calcularValorComDesconto(descontoDe10Porce):.2f}
 ''')
